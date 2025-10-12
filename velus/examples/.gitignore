@@ -1,0 +1,11 @@
+*.n.lus
+*.obc
+*.s
+*.light.c
+*.stc
+*.bkp
+*.wcet
+*.epci
+*.mls
+*_c
+*.h

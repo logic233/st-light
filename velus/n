@@ -1,0 +1,95 @@
+logic@LAPTOP-D17T7H9J:~/project/velus$ make  -f /home/logic/project/velus/Makefile.auto extraction 
+rm -f extraction/extracted/*.ml*
+"coqtop" -q -R "/home/logic/project/velus/src" Velus -R "/home/logic/project/velus/CompCert/lib" compcert.lib -R "/home/logic/project/velus/CompCert/common" compcert.common -R "/home/logic/project/velus/CompCert/backend" compcert.backend -R "/home/logic/project/velus/CompCert/cfrontend" compcert.cfrontend -R "/home/logic/project/velus/CompCert/driver" compcert.driver -R "/home/logic/project/velus/CompCert/flocq" compcert.flocq -R "/home/logic/project/velus/CompCert/exportclight" compcert.exportclight -R "/home/logic/project/velus/CompCert/cparser" compcert.cparser -R "/home/logic/project/velus/CompCert/arm" compcert.arm  -batch -load-vernac-source ./extraction/Extraction.v
+File "./extraction/Extraction.v", line 166, characters 0-1070:
+Warning: The extraction is currently set to bypass opacity, the following
+opaque constant bodies have been accessed
+: find_rect Is_defined_in_dec fold_rect Step_in_dec
+  Interface.Op.cases_of_bool Is_variable_in_eq_dec well_sch_dec
+  Is_init_in_dec Is_variable_in_dec In_gather_mems_dec Is_defined_in_eq_dec
+  mem_rect equal_rect Clocks.clock_EqDec In_gather_insts_dec add_rect
+  Interface.Op.binop_dec Is_variable_in_tc_dec Interface.Op.unop_dec exp_dec
+  solve_constraints_terminate Interface.Op.val_dec Interface.Op.const_dec
+  Reset_in_dec solve_constraints_rect remove_rect Interface.Op.type_dec.
+ [extraction-opaque-accessed,extraction]
+File "./extraction/Extraction.v", line 187, characters 0-27:
+Warning: The extraction is currently set to bypass opacity, the following
+opaque constant bodies have been accessed
+: Maps.NIndexed.eq Rsqrt_def.Rsqrt_exists Ranalysis1.derivable_pt_minus
+  Ranalysis1.derivable_pt_const CRelationClasses.PartialOrder_inverse
+  Ranalysis1.derivable_pt_scal Ranalysis1.derivable_pt_plus
+  Ranalysis1.derivable_pt_mult Ranalysis1.derivable_pt_comp
+  Ranalysis1.derivable_pt_Rsqr
+  CMorphisms.per_partial_app_type_morphism_obligation_1 List.Forall_rect
+  RIneq.Req_EM_T CMorphisms.symmetric_equiv_flip CMorphisms.eq_subrelation
+  CMorphisms.flip_proper_obligation_1 CMorphisms.subrelation_id_proper
+  RIneq.Rle_lt_dec Ranalysis1.derivable_id Rbasic_fun.Rcase_abs
+  CMorphisms.proper_sym_flip
+  CMorphisms.trans_co_impl_type_morphism_obligation_1
+  CMorphisms.proper_subrelation_proper_arrow CMorphisms.flip_arrow
+  CMorphisms.pointwise_subrelation
+  CMorphisms.trans_sym_co_inv_impl_type_morphism_obligation_1
+  Alembert.AlembertC3_step2
+  CMorphisms.trans_contra_co_type_morphism_obligation_1
+  List.nth_in_or_default CMorphisms.proper_normalizes_proper
+  CRelationClasses.partial_order_antisym CRelationClasses.flip_PreOrder
+  RIneq.Rlt_dec RIneq.Rle_dec CMorphisms.proper_proper SeqProp.ub_to_lub
+  RIneq.Rgt_dec RIneq.Rge_dec RIneq.Rge_gt_dec
+  CRelationClasses.relation_implication_preorder PartSum.cv_cauchy_2
+  CMorphisms.proper_sym_arrow_iffT CMorphisms.reflexive_proper Rsqrt_def.IVT
+  Zeven.Zsplit2 List.exists_last RIneq.Rle_lt_or_eq_dec
+  CMorphisms.PartialOrder_proper_type
+  CMorphisms.trans_co_eq_inv_arrow_morphism_obligation_1 Raux.LPO_min
+  CMorphisms.trans_contra_inv_impl_type_morphism_obligation_1
+  CRelationClasses.flip_Reflexive CMorphisms.respectful_morphism
+  CMorphisms.proper_sym_flip_2 Rsqrt_def.dicho_up_cv Rsqrt_def.dicho_lb_cv
+  Rtrigo_def.exist_cos Ranalysis1.derivable_pt_id Ranalysis1.derivable_minus
+  Ranalysis1.derivable_const CRelationClasses.flip_StrictOrder
+  Rbasic_fun.Rmin_case List.destruct_list CMorphisms.pointwise_pointwise
+  CRelationClasses.relation_equivalence_equivalence Zpower.Zdiv_rest_correct
+  CMorphisms.flip_atom SeqProp.decreasing_cv
+  CMorphisms.PER_type_morphism_obligation_1 SeqProp.lb_to_glb SeqProp.min_cv
+  SeqProp.maj_cv CMorphisms.StrictOrder_PartialOrder
+  CMorphisms.Reflexive_partial_app_morphism
+  CMorphisms.proper_sym_arrow_iffT_2 SeqProp.growing_cv
+  CMorphisms.proper_proper_proxy CMorphisms.flip2 CMorphisms.flip1
+  Bool.eqb_spec CMorphisms.forall_subrelation Rpower.ln_exists1
+  RIneq.Rlt_le_dec CMorphisms.compose_proper_obligation_1
+  Rbasic_fun.Rmin_case_strong Zeven.Z_modulo_2 CMorphisms.subrelation_refl
+  CMorphisms.iffT_arrow_subrelation CRelationClasses.flip_Antisymmetric
+  RIneq.Rgt_ge_dec Ranalysis1.derivable_scal Ranalysis1.derivable_plus
+  Ranalysis1.derivable_mult Ranalysis1.derivable_comp
+  Ranalysis1.derivable_Rsqr Alembert.Alembert_C6 Alembert.Alembert_C5
+  Alembert.Alembert_C4 RIneq.inser_trans_R CMorphisms.StrictOrder_PreOrder
+  Rfunctions.intP Ranalysis1.derivable_pow Ranalysis1.derivable_opp
+  CMorphisms.subrelation_proper Ranalysis1.derivable_pt_pow
+  Ranalysis1.derivable_pt_opp CRelationClasses.flip_PER ZArith_dec.Z_notzerop
+  Rbasic_fun.Rmax_case_strong Rbasic_fun.Rmax_case
+  CMorphisms.PartialOrder_StrictOrder CMorphisms.iffT_flip_arrow_subrelation
+  CRelationClasses.flip_Equivalence CMorphisms.subrelation_respectful
+  CMorphisms.reflexive_eq_dom_reflexive
+  CMorphisms.respectful_per_obligation_2 ZArith_dec.Z_noteq_dec
+  Rcomplete.R_complete CMorphisms.flip_respectful Raux.LPO_Z Raux.mag
+  Raux.LPO Rsqrt_def.IVT_cor CRelationClasses.subrelation_symmetric
+  Rpower.ln_exists CMorphisms.reflexive_proper_proxy
+  CMorphisms.trans_sym_contra_arrow_morphism_obligation_1.
+ [extraction-opaque-accessed,extraction]
+File "./extraction/Extraction.v", line 187, characters 0-27:
+Warning: The following axioms must be realized in the extracted
+code: Raxioms.total_order_T Raxioms.completeness Rdefinitions.Rplus
+      Rdefinitions.Rmult Rdefinitions.Ropp Rdefinitions.Rinv Rdefinitions.up
+      Rdefinitions.R1 Rdefinitions.R0 Rdefinitions.R.
+ [extraction-axiom-to-realize,extraction]
+File "./extraction/Extraction.v", line 187, characters 0-27:
+Warning: The following logical axioms were
+encountered: Raxioms.Rmult_comm Raxioms.Rmult_plus_distr_l Raxioms.Rlt_asym
+             Raxioms.Rplus_0_l Raxioms.Rmult_assoc Raxioms.Rlt_trans
+             Raxioms.R1_neq_R0 Raxioms.Rinv_l Raxioms.Rmult_lt_compat_l
+             Rdefinitions.Rlt Raxioms.Rmult_1_l Raxioms.Rplus_comm
+             Raxioms.archimed Raxioms.Rplus_lt_compat_l Raxioms.Rplus_opp_r
+             Raxioms.Rplus_assoc.
+Having invalid logical axiom in the
+environment when extracting may lead to incorrect or non-terminating ML
+terms.
+ [extraction-logical-axiom,extraction]
+touch ./extraction/STAMP

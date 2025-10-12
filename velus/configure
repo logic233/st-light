@@ -1,0 +1,74 @@
+#!/bin/sh
+
+# ********************************************************************#
+#                                                                     #
+#                 The Vélus verified Lustre compiler                  #
+#                                                                     #
+#             (c) 2019 Inria Paris (see the AUTHORS file)             #
+#                                                                     #
+#  Copyright Institut National de Recherche en Informatique et en     #
+#  Automatique. All rights reserved. This file is distributed under   #
+#  the terms of the INRIA Non-Commercial License Agreement (see the   #
+#  LICENSE file).                                                     #
+#                                                                     #
+# ********************************************************************#
+
+# https://stackoverflow.com/a/43919044
+a="/$0"; a=${a%/*}; a=${a#/}; a=${a:-.}; BASEDIR=$(cd "$a" && pwd)
+
+# Absolute directories to allow use from subdirectories
+coqproject="$BASEDIR/_CoqProject"
+compcertdir="$BASEDIR/CompCert"
+srcdir="$BASEDIR/src"
+
+# Parse command-line arguments
+
+while : ; do
+  case "$1" in
+    "") break;;
+    -compcertdir|--compcertdir)
+        compcertdir="$2"; shift;;
+    -prefix|--prefix)
+        prefix="-prefix $2"; shift;;
+    -bindir|--bindir)
+        bindir="-bindir $2"; shift;;
+    -libdir|--libdir)
+        libdir=-"libdir $2"; shift;;
+    -toolprefix|--toolprefix)
+        toolprefix=-"toolprefix $2"; shift;;
+    -no-runtime-lib)
+        runtime_lib="-no-runtime-lib";;
+    -no-standard-headers)
+        standard_headers="-no-standard-headers";;
+    -clightgen)
+        clightgen="-clightgen";;
+    *)
+        target="$1";;
+  esac
+  shift
+done
+
+# Configure CompCert and extract relevant values into Makefile.config
+(cd "$compcertdir" &&
+ ./configure $prefix $bindir $libdir $toolprefix $runtime_lib \
+ $standard_headers $clightgen $target)
+if [ -f "$compcertdir"/Makefile.config ]; then
+    export "$(grep ARCH < "$compcertdir"/Makefile.config)"
+    export "$(grep BITSIZE < "$compcertdir"/Makefile.config)"
+fi
+
+printf "COMPCERTDIR=%s\\nARCH=%s\\n" "$compcertdir" "$ARCH" > Makefile.config
+
+# Generate the _CoqProject file
+{
+    printf -- "-R \"%s\" Velus\\n" "$srcdir";
+    while read -r subdir; do
+      printf -- "-R \"%s/%s\" compcert.%s\\n" "$compcertdir" "$subdir" "$subdir"
+    done <includes;
+    if [ "$ARCH" = x86 ]; then
+	      printf -- "-R \"%s\" compcert.%s\\n" "$compcertdir/${ARCH}_${BITSIZE}"\
+	             "${ARCH}_${BITSIZE}";
+    fi;
+    printf -- "-R \"%s\" compcert.%s\\n" "$compcertdir/$ARCH" "$ARCH";
+    cat vfiles
+} >"$coqproject"

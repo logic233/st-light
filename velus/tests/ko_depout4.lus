@@ -1,0 +1,25 @@
+
+node f(a: bool)
+returns (y: bool; z: bool when y);
+var t : bool;
+let
+    t = false fby a;
+    y = t;
+    z = true when t;
+tel
+
+node g(a: bool; b: bool when a)
+returns (y: bool when a);
+let
+  y = b;
+tel
+
+node main(b: bool)
+returns (x: bool when b)
+var s : bool;
+    t : bool when s;
+let
+  (s, t) = f(b);
+  x = g(s, t);
+tel
+

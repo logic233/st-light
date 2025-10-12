@@ -1,0 +1,31 @@
+node counter(ini, inc: int; reset: bool) returns (n: int)
+  var c: int; f: bool;
+let
+  n = if f or reset then ini else c + inc;
+  f = true fby false;
+  c = 1 fby n;
+tel
+
+node d_integrator(gamma: int)
+returns (speed, position: int)
+let
+  speed = counter(0, gamma, false);
+  position = counter(0, speed, false);
+tel
+
+node rising(s: bool) returns (edge: bool)
+var ps : bool;
+let
+    edge = not ps and s;
+    ps = true fby s;
+tel
+
+node tracker(acc, limit: int) returns (p, t: int)
+  var s, pt : int; x : bool; c : int when x;
+let
+  c = counter(1 when x, 1 when x, false when x);
+  x = rising(s > limit);
+  (s, p) = d_integrator(acc);
+  pt = 0 fby t;
+  t = merge x (true -> c) (false -> pt when not x);
+tel

@@ -1,0 +1,180 @@
+(* taken from the examples of lucid synchrone v3 *)
+(* a cruise control *)
+(* $id: cruise.ls,v 1.9 2009/02/07 04:35:35 gerard exp $ *)
+
+node cruisespeedmgt (onn, set, quickaccel, quickdecel : bool;
+                     speed : real; vreset: bool)
+returns (cruise_speed : real);
+var l1, l2, l3 : real;
+let
+  l1 = l3 + 5.0;
+  l2 = l3 - 5.0;
+  cruise_speed = 
+    if vreset then 0.0
+    else if quickdecel and (l2 >= 30.0) then l2
+    else if quickaccel and (l1 <= 150.0) then l1
+    else if (onn or set) and (speed <= 150.0) and (speed >= 30.0) then speed
+    else l3;
+  l3 = 0.0 fby cruise_speed;
+tel
+
+(* a pi regulation *)
+node regulator (cruise_speed, speed : real; vreset : bool)
+returns (throttle : real);
+var delta, pre_aux, aux : real;
+let
+  delta = cruise_speed - speed;
+  throttle = delta * 10.0 + aux * 0.2;
+  aux = if vreset then delta else delta + pre_aux;
+  pre_aux = 0.0 fby aux;
+tel
+ 
+node cruisecontrol (onn, off, resume : bool; speed : real;
+                    set, quist_onaccel, quist_ondecel : bool;
+                    accel, brake : real)
+returns (cruisespeed, throttlecmd : real);
+var braking, accelerator  : bool;
+    between : bool when not st_interrupt;
+    r_1, nr_1, pre_nr_1 : bool when st_on;
+    r_2, nr_2 : bool;
+    regul_on : real when not st_standby;
+    cruise_speed : real when not st_interrupt;
+    throttlecmd_2, cruisespeed_2 : real when st_on;
+    pre_cruisespeed : real;
+    st_interrupt, ns_1, pre_ns_1 : bool when st_on;
+    r, st_standby, ns, pre_ns : bool when not st_interrupt;
+    st_on, ns_2 : bool;
+let
+  braking = brake > 0.0;
+  accelerator = accel > 0.0;
+
+  regul_on =
+    regulator(cruise_speed when not st_standby,
+              ((speed when st_on) when not st_interrupt) when not st_standby,
+              ((((r_2 when st_on) or r_1) when not st_interrupt) or r)
+                                                          when not st_standby);
+  cruise_speed = cruisespeedmgt
+                   (onn when st_on when not st_interrupt,
+                    set when st_on when not st_interrupt,
+                    quist_onaccel when st_on when not st_interrupt,
+                    quist_ondecel when st_on when not st_interrupt,
+                    speed when st_on when not st_interrupt,
+                    ((r_2 when st_on) or r_1) when not st_interrupt);
+
+  throttlecmd = merge st_on (true -> throttlecmd_2)
+                            (false -> accel when not st_on);
+  cruisespeed = merge st_on (true -> cruisespeed_2)
+                            (false -> pre_cruisespeed when not st_on);
+  pre_cruisespeed = 0.0 fby cruisespeed;
+
+  between = (((speed >= 30.0) and (speed <= 150.0)) when st_on)
+            when not st_interrupt;
+
+  throttlecmd_2 =
+    merge st_interrupt
+          (true -> (accel when st_on) when st_interrupt)
+          (false -> merge st_standby
+                          (true -> ((accel when st_on) when not st_interrupt)
+                                                              when st_standby)
+                          (false -> regul_on));
+
+  cruisespeed_2 = merge st_interrupt
+                        (true ->
+                          (pre_cruisespeed when st_on) when st_interrupt)
+                        (false -> cruise_speed);
+
+  (* vstate logic
+     off: st_on = false
+          until onn then on
+
+     on:  st_on = true
+          | regulation: st_interrupt = false
+          |             | regulon: st_standby = false
+          |               until (accelerator or not between) then standby
+          |             | standby: st_standby = true
+          |               until (not accelerator and between) then regulon
+          |             until braking then interrupt
+          | interrupt:  st_interrupt = true
+          |             until resume then regulation
+          until off then off
+  *)
+  st_on = false fby ns_2;
+  ns_2 = merge st_on (true -> not off when st_on)
+                     (false -> onn when not st_on);
+  nr_2 = merge st_on (true -> off when st_on)
+                     (false -> onn when not st_on);
+
+  st_standby = if (((r_2 when st_on) or r_1) when not st_interrupt)
+               then (false when st_on when not st_interrupt) else pre_ns;
+  ns = ((accelerator when st_on) when not st_interrupt) or not between;
+  pre_ns = false fby ns;
+  r = if (((r_2 when st_on) or r_1) when not st_interrupt)
+      then (false when st_on when not st_interrupt) else pre_ns;
+  r_2 = false fby nr_2;
+
+  st_interrupt = if (r_2 when st_on) then (false when st_on) else pre_ns_1;
+  ns_1 = merge st_interrupt
+               (true -> not ((resume when st_on) when st_interrupt))
+               (false -> not ((braking when st_on) when not st_interrupt));
+  pre_ns_1 = false fby ns_1;
+  r_1  = if (r_2 when st_on) then (false when st_on) else pre_nr_1;
+  pre_nr_1 = false fby nr_1;
+  nr_1 = merge st_interrupt
+               (true -> (resume when st_on) when st_interrupt)
+               (false -> (braking when st_on) when not st_interrupt);
+tel
+
+(* make an interface for continuous inputs *)
+node button(vvinit, vstep : real; key_present, key_up : bool)
+returns (o : real);
+var last_o : real; first : bool;
+let
+  first = true fby false;
+  last_o = 0.0 fby o;
+  o = if key_present then
+        (if key_up then last_o + vstep
+                   else last_o - vstep)
+      else if first then vvinit
+      else last_o;
+tel
+
+(* make the interface for manual testing *)
+(* all the inputs are given through the keyboard *)
+node interface(key : int)
+returns (onn, off, set, resume, quickaccel, quickdecel : bool;
+         speed, accel, brake : real);
+var vvinit, speed_present, speed_up : bool;
+    pre_speed : real;
+let
+  onn = (key = 111); -- 'o'
+  off = (key = 102); -- 'f'
+  set = (key = 115); -- 's'
+  resume = (key = 114); -- 'r'
+  quickaccel = (key = 97); -- 'a'
+  quickdecel = (key = 100); -- 'd'
+
+  speed_present = (key = 43 or key = 45); -- '+' or '-'
+  speed_up = (key = 43); -- '+'
+
+  brake = if key = 98 then 1.0 else 0.0; -- 'b'
+
+  vvinit = true fby false;
+  speed = button(0.0, 2.0, speed_present, speed_up);
+  pre_speed = 0.0 fby speed;
+  accel = if vvinit then 0.0 else speed - pre_speed;
+tel
+
+node cruise (key : int)
+returns (cruisespeed, throttlecmd : real);
+var onn, off, set, resume, quickaccel, quickdecel : bool;
+    speed, accel, brake : real;
+let
+  (onn, off, set, resume, quickaccel, quickdecel, speed, accel, brake) =
+      interface(key);
+
+  (cruisespeed, throttlecmd) =
+    cruisecontrol (onn, off, resume,
+                   speed, set, quickaccel,
+                   quickdecel, accel, brake);
+tel
+

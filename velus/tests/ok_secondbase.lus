@@ -1,0 +1,10 @@
+
+node f (a : bool when b;
+        b : bool)
+returns (y : bool);
+var t : bool;
+let
+  t = false fby true;
+  y = t;
+tel
+

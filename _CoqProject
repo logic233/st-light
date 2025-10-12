@@ -1,0 +1,12 @@
+-R "./velus/src" Velus
+-R "./velus/CompCert/lib" compcert.lib
+-R "./velus/CompCert/common" compcert.common
+-R "./velus/CompCert/backend" compcert.backend
+-R "./velus/CompCert/cfrontend" compcert.cfrontend
+-R "./velus/CompCert/driver" compcert.driver
+-R "./velus/CompCert/flocq" compcert.flocq
+-R "./velus/CompCert/exportclight" compcert.exportclight
+-R "./velus/CompCert/cparser" compcert.cparser
+-R "./velus/CompCert/arm" compcert.arm
+-R "./velus/CompCert/x86_64" compcert.x86_64
+-R "./src" ST
